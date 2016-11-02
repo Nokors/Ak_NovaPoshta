@@ -25,7 +25,7 @@ class Ak_NovaPoshta_Block_Checkout_Shipping_Destination
      */
     public function getCityId()
     {
-        $cityId = (int) $this->getData('city_id');
+        $cityId = $this->getData('city_id');
         if (!$cityId) {
             $warehouse = $this->getWarehouse();
             if ($warehouse) {

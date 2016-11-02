@@ -8,27 +8,28 @@ class Ak_NovaPoshta_Model_Import
     protected $_existingWarehouses;
 
     protected $_dataMapCity = array(
-        'id' => 'id',
-        'nameRu' => 'name_ru',
-        'nameUkr' => 'name_ua'
+        'Ref' => 'id',
+        'DescriptionRu' => 'name_ru',
+        'Description' => 'name_ua'
     );
 
     protected $_dataMapWarehouse = array(
-        'wareId' => 'id',
-        'city_id' => 'city_id',
-        'address' => 'address_ua',
-        'addressRu' => 'address_ru',
-        'phone' => 'phone',
-        'weekday_work_hours' => 'weekday_work_hours',
-        'weekday_reseiving_hours' => 'weekday_reseiving_hours',
-        'weekday_delivery_hours' => 'weekday_delivery_hours',
-        'saturday_work_hours' => 'saturday_work_hours',
-        'saturday_reseiving_hours' => 'saturday_reseiving_hours',
-        'saturday_delivery_hours' => 'saturday_delivery_hours',
-        'max_weight_allowed' => 'max_weight_allowed',
-        'x' => 'longitude',
-        'y' => 'latitude',
-        'number' => 'number_in_city'
+        'Ref' => 'id',
+        'CityRef' => 'city_id',
+        'Description' => 'address_ua',
+        'DescriptionRu' => 'address_ru',
+        'Phone' => 'phone',
+
+        /** @toDo Make new mapping functionality.
+        'Reception' => ,
+        'Delivery' => ,
+        'Schedule' =>,
+         */
+
+        'MaxWeightAllowed' => 'max_weight_allowed',
+        'Longitude' => 'longitude',
+        'Latitude' => 'latitude',
+        'Number' => 'number_in_city'
     );
 
     /**
@@ -147,6 +148,7 @@ class Ak_NovaPoshta_Model_Import
     protected function _applyMap(array $apiObjects, array $map)
     {
         $resultingArray = array();
+        $apiObjects = array_pop($apiObjects);
         $idKey = array_search('id', $map);
         foreach ($apiObjects as $apiObject) {
             $id = (string) $apiObject->$idKey;
@@ -161,6 +163,7 @@ class Ak_NovaPoshta_Model_Import
 
         return $resultingArray;
     }
+
 
     /**
      * @return Varien_Db_Adapter_Interface

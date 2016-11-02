@@ -21,7 +21,7 @@ class Ak_NovaPoshta_CheckoutController
     public function calculateAction()
     {
         $helper         = Mage::helper('novaposhta');
-        $warehouseId    = (int) $this->getRequest()->getParam('warehouse');
+        $warehouseId    = $this->getRequest()->getParam('warehouse');
         $result         = $helper->getShippingCost($warehouseId);
         $result['cost'] = $helper->currency( (float) $result['cost'], true, false);
 

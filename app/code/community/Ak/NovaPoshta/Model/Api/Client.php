@@ -6,7 +6,7 @@ class Ak_NovaPoshta_Model_Api_Client
     const DELIVERY_TYPE_APARTMENT_APARTMENT = 1;
     const DELIVERY_TYPE_APARTMENT_WAREHOUSE = 2;
     const DELIVERY_TYPE_WAREHOUSE_APARTMENT = 3;
-    const DELIVERY_TYPE_WAREHOUSE_WAREHOUSE = 4;
+    const DELIVERY_TYPE_WAREHOUSE_WAREHOUSE = 'WarehouseWarehouse';
 
     const LOAD_TYPE_STANDARD   = 1;
     const LOAD_TYPE_SECURITIES = 4;
@@ -48,7 +48,7 @@ class Ak_NovaPoshta_Model_Api_Client
     {
         if (is_null($element)) {
             $element = new SimpleXMLElement('<file/>');
-            $element->addChild('auth', $this->_getApiKey());
+            $element->addChild('apiKey', $this->_getApiKey());
         }
 
         foreach ($array as $key => $value) {
@@ -100,10 +100,11 @@ class Ak_NovaPoshta_Model_Api_Client
     public function getCityWarehouses()
     {
         $responseXml = $this->_makeRequest(array(
-            'citywarehouses' => null,
+            'calledMethod' => 'getCities',
+            'modelName' => 'Address',
         ));
 
-        return $responseXml->xpath('result/cities/city');
+        return $responseXml->xpath('data');
     }
 
     /**
@@ -112,43 +113,53 @@ class Ak_NovaPoshta_Model_Api_Client
     public function getWarehouses()
     {
         $responseXml = $this->_makeRequest(array(
-            'warenhouse' => null,
+            'calledMethod' => 'getWarehouses',
+            'modelName' => 'AddressGeneral',
         ));
 
-        return $responseXml->xpath('result/whs/warenhouse');
+        return $responseXml->xpath('data');
     }
 
     public function getShippingCost(
-        Zend_Date $deliveryDate,
-        Ak_NovaPoshta_Model_City $senderCity, Ak_NovaPoshta_Model_City $recipientCity,
-        $packageWeight, $packageLength, $packageWidth, $packageHeight, $publicPrice,
+        Ak_NovaPoshta_Model_City $senderCity,
+        Ak_NovaPoshta_Model_City $recipientCity,
+        $packageWeight,
+        $publicPrice,
+        $qty = 0,
         $deliveryType = self::DELIVERY_TYPE_WAREHOUSE_WAREHOUSE,
-        $loadType = self::LOAD_TYPE_STANDARD,
-        $floor = 0)
+        $loadType = self::LOAD_TYPE_STANDARD
+    )
     {
         $response = $this->_makeRequest(array(
-            'countPrice' => array(
-                'date' => $deliveryDate->toString(Zend_Date::DATE_MEDIUM),
-                'senderCity' => $senderCity->getData('name_ru'),
-                'recipientCity' => $recipientCity->getData('name_ru'),
-                'mass' => $packageWeight,
-                'depth' => $packageLength,
-                'widht' => $packageWidth,
-                'height' => $packageHeight,
-                'publicPrice' => $publicPrice,
-                'deliveryType_id' => $deliveryType,
-                'loadType_id' => $loadType,
-                'floor_count' => $floor,
+            'modelName' => 'InternetDocument',
+            'calledMethod' => 'getDocumentPrice',
+            'methodProperties' => array(
+                'CitySender' => $senderCity->getId(),
+                'CityRecipient' => $recipientCity->getId(),
+                'ServiceType' => $loadType,
+                'Weight' => $packageWeight,
+                'Cost' => $publicPrice,
+                'Amount' => $qty,
+                'ServiceType' => $deliveryType
+
+//                'depth' => $packageLength,
+//                'widht' => $packageWidth,
+//                'height' => $packageHeight,
+//                'deliveryType_id' => $deliveryType,
+//                'floor_count' => $floor,
+//                'date' => $deliveryDate->toString(Zend_Date::DATE_MEDIUM),
+
             )
         ));
 
         if (1 == (int) $response->error) {
             Mage::throwException('Novaposhta Api error');
         }
-
+        $responseData = $response->xpath('data/item');
+        $cost = (string) $responseData[0]->Cost;
         return array (
-            'delivery_date' => (string) $response->date,
-            'cost' => (float) $response->cost,
+//            'delivery_date' => (string) $response->date,
+            'cost' => (float) $cost,
         );
     }
 }

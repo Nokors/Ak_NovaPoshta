@@ -107,14 +107,13 @@ class Ak_NovaPoshta_Helper_Data extends Mage_Core_Helper_Data
         $destinationWarehouse = Mage::getModel('novaposhta/warehouse')->load($destinationWarehouseId);
         $senderCity           = $this->getSenderCity();
         $destinationCity      = $destinationWarehouse->getCity();
-        $deliveryDate         = $this->getDeliveryDate();
 
-        $result = $this->getApi()->getShippingCost($deliveryDate, $senderCity, $destinationCity,
+        $result = $this->getApi()->getShippingCost(
+            $senderCity,
+            $destinationCity,
             $this->getDefaultPackageWeight(),
-            $this->getDefaultPackageLength(),
-            $this->getDefaultPackageWidth(),
-            $this->getDefaultPackageHeight(),
-            $quote->getSubtotal()
+            $quote->getSubtotal(),
+            $quote->getItemsSummaryQty()
         );
 
         return $result;
