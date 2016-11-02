@@ -141,14 +141,6 @@ class Ak_NovaPoshta_Model_Api_Client
                 'Cost' => $publicPrice,
                 'Amount' => $qty,
                 'ServiceType' => $deliveryType
-
-//                'depth' => $packageLength,
-//                'widht' => $packageWidth,
-//                'height' => $packageHeight,
-//                'deliveryType_id' => $deliveryType,
-//                'floor_count' => $floor,
-//                'date' => $deliveryDate->toString(Zend_Date::DATE_MEDIUM),
-
             )
         ));
 
@@ -158,7 +150,6 @@ class Ak_NovaPoshta_Model_Api_Client
         $responseData = $response->xpath('data/item');
         $cost = (string) $responseData[0]->Cost;
         return array (
-//            'delivery_date' => (string) $response->date,
             'cost' => (float) $cost,
         );
     }
